@@ -1,0 +1,21 @@
+/* Empty. Add your own CSS if you like */
+body {
+    overflow-y:scroll;
+}
+.odd {
+  background-color: #f1f1f1;
+  border: thin solid #D8D8D8;
+}
+.even {
+  background-color: #E8E8E8;
+  border: thin solid #D8D8D8;
+}
+.header {
+  background-color: #ccddff;
+}
+.home-background {
+    background: url("images/phone/home.png") no-repeat fixed center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+}

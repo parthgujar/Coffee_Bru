@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *">
+
+	<title>Coffee Bru</title>
+	
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+	
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	
+	<script src="https://js.stripe.com/v2/"></script>
+	
+	
+	<!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+	<script src="lib/ionic/js/ionic-angular.min.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+	<script src="js/ng-cordova.min.js"></script>
+    <script src="cordova.js"></script>
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+	
+	<!-- <script src="lib/ionic/js/stripe-angular.js"></script> -->
+	<script src="lib/ionic/js/jquery.qrcode.js"></script>
+	<script src="lib/ionic/js/qrcode.js"></script>
+	<script src="lib/ionic/js/jsencrypt.js"></script>
+	
+	
+  </head>
+  <body ng-app="page" ng-controller="controller">
+	
+    <ion-pane>
+	
+	<ion-header-bar class="bar bar-header" align-title="center">
+		<div class="buttons">
+			<button class="button button-clear button-dark" ng-show="Add_Item_Menu" ng-click="addItem()"><i class="icon ion-plus"></i></button>
+			<button class="button" ng-show="personal_details_customer" ng-click="signUp_1()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="cardDetails_1" ng-click="signUpType(signUp_details_pd)"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="login_details_1" ng-click="cardDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="passwordDetails_1" ng-click="customerDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="cardDetailsUpdate_1" ng-click="customerDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="bussiness_pd_form_1" ng-click="signUp_1()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="StripeKey_form_1" ng-click="signUpType(signUp_details_pd)"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="bussiness_ld_1" ng-click="bussiness_AccoutDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="bussiness_cp_1" ng-click="bussinessDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="bussiness_sa_show" ng-click="bussinessDetails()"><i class="ion-chevron-left"></i> Back</button>
+			<button class="button" ng-show="cart_show" ng-click="backToMenu()"><i class="ion-chevron-left"></i> Back</button>
+		</div>
+		<h1 class="title">Coffee Bru !!</h1>
+		<div class="buttons">
+			<button class="button button-clear button-dark" ng-show="logout_1" ng-click="logout()"><i class="icon ion-log-out"></i></button>
+			<button class="button" ng-show="edit_Done" ng-click="editComplete()">Done</button>
+			<button class="button button-clear button-dark" ng-show="edit_Menu" ng-click="editItems()"><i class="icon ion-edit"></i></button>
+		</div>
+	</ion-header-bar>
+
+	<ion-content>	
+		
+		<form name="signIn_Form" novalidate>
+			<div class="list" ng-show="userSignIn">
+				
+				<ion-toggle ng-model="signIn_Details.bussiness" toggle-class="toggle-calm">Bussiness</ion-toggle>
+
+				<label class="item item-input">
+					<span class="input-label">Username</span>
+					<input type="text" ng-model="signIn_Details.email" name="email"
+					 ng-blur="signIn_Form.email.$dirty && validateEmail(signIn_Details)" maxlength="30" required autocomplete=off>
+				</label>
+		
+				
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="signIn_Details.password" name="password" maxlength="16" autocomplete=off  required>
+				</label>
+				
+				
+				<button class="button button-block button-positive" ng-disabled="signIn_Form.$invalid" ng-click="signIn_User(signIn_Details)" >Sign In</button>
+
+			</div>
+		</form>
+		
+		
+		<form name="signUpType_Form" novalidate>
+			<div class="list" ng-show="signUpType_1">
+				<div>
+				<ion-toggle ng-model="signUp_details_pd.bussiness" name="bussiness" toggle-class="toggle-calm">Sign up as Bussiness</ion-toggle>
+				</div>
+				<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="signUpType(signUp_details_pd)" ng-disabled="">Next</button>
+			</div>
+		</form>	
+		
+		<form name="personalDetails_Form" novalidate>
+			<div class="list" ng-show="personal_details_customer">					
+					
+					<label class="item item-input">
+						<span class="input-label">First Name</span>
+						<input type="text" ng-model="signUp_details_pd.firstName" name="firstName" ng-blur="personalDetails_Form.firstName.$dirty && custpd_FirstName(signUp_details_pd)" maxlength="20" autocomplete=off required>
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Last Name</span>
+						<input type="text" ng-model="signUp_details_pd.lastName" name="lastName" maxlength="20" ng-blur="personalDetails_Form.lastName.$dirty && custpd_LastName(signUp_details_pd)" autocomplete=off required>
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Contact</span>
+						<input type="text" name="contact" ng-model="signUp_details_pd.contact" ng-blur="personalDetails_Form.contact.$dirty && custpd_Contact(signUp_details_pd)" maxlength="10" autocomplete=off required/>
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Email</span>
+						<input type="text" ng-model="signUp_details_pd.email" name="email" ng-blur="personalDetails_Form.email.$dirty && custpd_Email(signUp_details_pd)" maxlength="30" autocomplete=off required>
+					</label>
+					
+					
+					<div class="button-bar">
+						<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="signUp_1()" ng-disabled="">Back</button> -->
+						<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="cardDetails()" ng-disabled="personalDetails_Form.$invalid">Next</button>
+						
+					</div>
+				
+			</div>
+		</form>	
+		
+		<form name="paymentForm" novalidate>
+			<div class="list" ng-show="cardDetails_1">
+					
+					<label class="item item-input">
+						<span class="input-label">Card Number</span>
+						<input type="text" name="number" ng-model="signUp_details.number" maxlength="19" autocomplete=off ng-blur="paymentForm.number.$dirty && custPayment_CC(signUp_details)" required data-credit-card-type >
+						
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Card Type</span>
+						<input type="text" ng-model="signUp_details.type" name="type" ng-blur="paymentForm.type.$dirty && custPayment_type(signUp_details)" ng-disabled="true" autocomplete=off required >
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Name on card</span>
+						<input type="text" ng-model="signUp_details.name" name="name" maxlength="20" ng-blur="paymentForm.name.$dirty && custPayment_name(signUp_details)" autocomplete=off required>
+					</label>
+					
+					
+					<label class="item item-input">
+						<span class="input-label">CCV</span>
+						<input type="password" name="securityCode" ng-model="signUp_details.securityCode" autocomplete=off required ng-blur="paymentForm.securityCode.$dirty && custPayment_securityCode(signUp_details)" maxlength="3" >
+					</label>
+					
+					
+					
+					<label class="item item-input">
+						<span class="input-label">Expiration Month</span>
+						<select ng-model="signUp_details.month" name="month" data-card-expiration required autocomplete=off >
+						<option disabled selected value="">Month</option>
+						<option ng-repeat="month in months" value="{{$index+1}}" > {{$index+1}} - {{month}}</li>
+						</select>
+					</label>
+					
+    
+					<label class="item item-input">
+						<span class="input-label">Expiration Year</span>
+						<select ng-model="signUp_details.year" name="year" required autocomplete=off>
+						<option disabled selected value="">Year</option>
+						<option ng-repeat="year in [] | range:currentYear:currentYear+13">{{year}}</li>
+						</select>
+					</label>
+					
+	
+					<div class="button-bar">
+						<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="signUpType(signUp_details_pd)" ng-disabled="">Back</button> -->
+						<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="loginDetails()" ng-disabled="paymentForm.$invalid">Next</button>
+						<!-- paymentForm.$invalid -->
+					</div>
+					
+			</div>	
+		</form>
+
+		<form name="loginDetails_Form" novalidate>
+			<div class="list" ng-show="login_details_1">
+				
+				<label class="item item-input">
+					<span class="input-label">Username</span>
+					<input type="text" ng-model="signUp_details_pd.email" ng-disabled="true" name="username" autocomplete=off disabled>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="signUp_details_pd.password" name="password" maxlength="16" autocomplete=off ng-blur="loginDetails_Form.password.$dirty && custLF_Password(signUp_details_pd)" required>
+				</label>
+					
+				<label class="item item-input">
+					<span class="input-label">Confirm Password</span>
+					<input type="password" ng-model="signUp_details_pd.confPassword" name="confPassword" autocomplete=off  ng-blur="loginDetails_Form.confPassword.$dirty && custLF_ConfPassword(signUp_details_pd)" maxlength="16" required>
+				</label>
+				
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="cardDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="submit_customer(signUp_details,signUp_details_pd)" ng-disabled="loginDetails_Form.$invalid">Submit</button>		
+				</div>	
+				
+			</div>
+		</form>
+		
+		
+		<div ng-show="qrcodeCanvas_1">
+			<center><p id="qrcodeCanvas"></p></center>
+		</div>
+		
+		
+		<div ng-show="customer_details">
+				<label class="item item-input">
+					<span class="input-label">First Name</span>
+					<input type="text" ng-model="customer_details_1.firstName" name="firstName" autocomplete=off required ng-disabled="true">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Last Name</span>
+					<input type="text" ng-model="customer_details_1.lastName" name="lastName" autocomplete=off required ng-disabled="true">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Contact</span>
+					<input type="text" name="contact" ng-model="customer_details_1.contact" autocomplete=off required ng-disabled="true"/>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Email</span>
+					<input type="email" ng-model="customer_details_1.email" name="email" autocomplete=off required ng-disabled="true">
+				</label>
+					<button class="button button-block icon-right ion-chevron-right button-positive" ng-click="passwordView()" ng-disabled="">Change Password</button>
+					<button class="button button-block icon-right ion-chevron-right button-positive" ng-click="cardDetailsView()" ng-disabled="">Change Credit Card Details
+					</button>
+		</div>
+		
+		<form name="passwordDetails_Form" novalidate>
+			<div class="list" ng-show="passwordDetails_1">
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="password_details_View.password" name="password" maxlength="16" autocomplete=off required>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">New Password</span>
+					<input type="password" ng-model="password_details_View.newPassword" ng-blur="passwordDetails_Form.newPassword.$dirty && custPD_NewPass(password_details_View)" name="newPassword" maxlength="16" autocomplete=off required>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Confirm Password</span>
+					<input type="password" ng-model="password_details_View.confPassword" name="confPassword" maxlength="16" ng-blur="passwordDetails_Form.confPassword.$dirty && custPD_ConfPass(password_details_View)" autocomplete=off required>
+				</label>
+				
+				
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="customerDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="changePassword(password_details_View)" ng-disabled="passwordDetails_Form.$invalid">Submit
+					</button>		
+				</div>	
+			</div>
+		</form>	
+		
+		<form name="card_details_Form" novalidate>
+			<div class="list" ng-show="cardDetailsUpdate_1">
+				
+				<div>
+					<label class="item item-input">
+						<span class="input-label">Card Number</span>
+						<input type="text" name="cardNumber" ng-model="card_details_1.cardNumber" required ng-disabled="true">
+					</label>
+					<label class="item item-input">
+						<span class="input-label">Card Type</span>
+						<input type="text" ng-model="card_details_1.cardtype" name="cardtype" required ng-disabled="true">
+					</label>
+				</div>
+				
+				<div>
+					<label class="item item-input">
+						<span class="input-label">Card Number</span>
+						<input type="text" name="number" ng-model="signUp_details.number" maxlength="19" autocomplete=off ng-blur="card_details_Form.number.$dirty && custPayment_CC(signUp_details)" required data-credit-card-type >
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Card Type</span>
+						<input type="text" ng-model="signUp_details.type" name="type" ng-blur="card_details_Form.type.$dirty && custPayment_type(signUp_details)" ng-disabled="true" autocomplete=off required >
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Name on card</span>
+						<input type="text" ng-model="signUp_details.name" name="name" maxlength="20" ng-blur="card_details_Form.name.$dirty && custPayment_name(signUp_details)" autocomplete=off required>
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">CCV</span>
+						<input type="password" name="securityCode" ng-model="signUp_details.securityCode" autocomplete=off required ng-blur="card_details_Form.securityCode.$dirty && custPayment_securityCode(signUp_details)" maxlength="3" >
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Expiration Month</span>
+						<select ng-model="signUp_details.month" name="month" data-card-expiration required autocomplete=off >
+						<option disabled selected value="">Month</option>
+						<option ng-repeat="month in months" value="{{$index+1}}" > {{$index+1}} - {{month}}</li>
+						</select>
+					</label>
+					
+					<label class="item item-input">
+						<span class="input-label">Expiration Year</span>
+						<select ng-model="signUp_details.year" name="year" required autocomplete=off>
+						<option disabled selected value="">Year</option>
+						<option ng-repeat="year in [] | range:currentYear:currentYear+13">{{year}}</li>
+						</select>
+					</label>
+					
+				</div>
+				
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="customerDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="updateCreditCard(signUp_details)" ng-disabled="card_details_Form.$invalid">Submit
+					</button>		
+				</div>	
+			
+			</div>
+		</form>
+		
+		
+		<div ng-show="CustPayment_History">
+			<div class="row header">
+				<div class="col">Date of Transaction</div>
+				<div class="col">Bussiness Name</div>
+				<div class="col">Amount</div>
+			</div>
+			<div class="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="custPayment in custPaymentArray" >
+				<div class="col">{{custPayment.date}}</div>
+				<div class="col">{{custPayment.bussiness_name}}</div>
+				<!-- <div class="col col-40">{{custPayment.bussiness_email}}</div> -->
+				<div class="col">{{custPayment.amount | currency}}</div>
+			</div>
+		</div>
+		
+		
+		<form name="bussiness_pd_form" novalidate>				
+			<div class="list" ng-show="bussiness_pd_form_1">	
+				
+				<label class="item item-input">
+					<span class="input-label">Bussiness Name</span>
+					<input type="text" ng-model="signUp_details_pd.name" name="name" 
+					ng-blur="bussiness_pd_form.name.$dirty && buss_pd_Name(signUp_details_pd)" maxlength="20" autocomplete=off required>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Contact</span>
+					<input type="text" name="contact" ng-model="signUp_details_pd.contact" maxlength="10" 
+					ng-blur="bussiness_pd_form.contact.$dirty && buss_pd_Contact(signUp_details_pd)" autocomplete=off required/>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Email</span>
+					<input type="text" ng-model="signUp_details_pd.email" name="email" 
+					ng-blur="bussiness_pd_form.email.$dirty && buss_pd_Email(signUp_details_pd)" maxlength="30" autocomplete=off required>
+				</label>
+				
+					
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="signUp_1()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" 
+					ng-click="bussiness_AccoutDetails()" ng-disabled="bussiness_pd_form.$invalid">Next</button>
+				</div>
+			</div>
+		</form>
+		
+		
+		<form name="StripeKey_form" novalidate>	
+			<div ng-show="StripeKey_form_1">
+			
+				<label class="item item-input">
+					<span class="input-label">Publishable Key</span>
+					<input type="text" ng-model="stripe_key.publishKey" name="publishKey" 
+					ng-blur="StripeKey_form.publishKey.$dirty && stripe_PublicKey(stripe_key)" maxlength="40" autocomplete=off required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">conf Publishable Key</span>
+					<input type="text" ng-model="stripe_key.confpublishKey" name="confpublishKey" 
+					ng-blur="StripeKey_form.confpublishKey.$dirty && stripe_ConfPublicKey(stripe_key)" maxlength="40" autocomplete=off required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Private Key</span>
+					<input type="password" ng-model="stripe_key.privateKey" name="privateKey" 
+					ng-blur="StripeKey_form.privateKey.$dirty && stripe_PrivateKey(stripe_key)" maxlength="40" autocomplete=off required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Conf Private Key</span>
+					<input type="password" ng-model="stripe_key.confprivateKey" name="confprivateKey" 
+					ng-blur="StripeKey_form.confprivateKey.$dirty && stripe_ConfPrivateKey(stripe_key)" maxlength="40" autocomplete=off required>
+				</label>
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="signUpType(signUp_details_pd)" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="bussiness_loginform()" ng-disabled="StripeKey_form.$invalid">Next</button>
+						
+				</div>
+			</div>
+		</form>	
+		
+		<form name="bussiness_ld_Form" novalidate>
+			<div ng-show="bussiness_ld_1">
+				<label class="item item-input">
+					<span class="input-label">Username</span>
+					<input type="text" ng-model="signUp_details_pd.email" ng-disabled="true" name="username" autocomplete=off ng-disabled="true">
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="signUp_details_pd.password" name="password" maxlength="16" 
+					autocomplete=off ng-blur="bussiness_ld_Form.password.$dirty && custLF_Password(signUp_details_pd)" required>
+				</label>
+					
+				<label class="item item-input">
+					<span class="input-label">Confirm Password</span>
+					<input type="password" ng-model="signUp_details_pd.confPassword" name="confPassword" autocomplete=off  ng-blur="bussiness_ld_Form.confPassword.$dirty && custLF_ConfPassword(signUp_details_pd)" maxlength="16" required>
+				</label>
+				
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="bussiness_AccoutDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="submit_bussiness(stripe_key,signUp_details_pd)" ng-disabled="bussiness_ld_Form.$invalid">Submit</button>		
+				</div>
+			</div>
+		</form>		
+		
+		
+		
+		<div ng-show="bussiness_details">
+				<label class="item item-input">
+					<span class="input-label">Name</span>
+					<input type="text" ng-model="bussiness_details_1.name" name="name" autocomplete=off required ng-disabled="true">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Contact</span>
+					<input type="text" name="contact" ng-model="bussiness_details_1.contact" autocomplete=off required ng-disabled="true"/>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Email</span>
+					<input type="email" ng-model="bussiness_details_1.email" name="email" autocomplete=off required ng-disabled="true">
+				</label>
+					<button class="button button-block icon-right ion-chevron-right button-positive" ng-click="bussiness_p()" ng-disabled="">Change Password</button>
+					<button class="button button-block icon-right ion-chevron-right button-positive" ng-click="bussiness_sa_details()" ng-disabled="">Change Stripe Account</button>
+		</div>
+		
+		<form name="bussiness_cp_Form" novalidate>
+			<div ng-show="bussiness_cp_1">
+			
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="bussiness_pass_view.password" name="password" maxlength="16" autocomplete=off required>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">New Password</span>
+					<input type="password" ng-model="bussiness_pass_view.newPassword" ng-blur="bussiness_cp_Form.newPassword.$dirty && bussPass_NewPass(bussiness_pass_view)" name="newPassword" maxlength="16" autocomplete=off required>
+				</label>
+				
+				<label class="item item-input">
+					<span class="input-label">Confirm Password</span>
+					<input type="password" ng-model="bussiness_pass_view.confPassword" name="confPassword" maxlength="16" ng-blur="bussiness_cp_Form.confPassword.$dirty && bussPass_ConfPass(bussiness_pass_view)" autocomplete=off required>
+				</label>
+				
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="bussinessDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="bussiness_changePassword(bussiness_pass_view)" ng-disabled="bussiness_cp_Form.$invalid">Submit
+					</button>		
+				</div>
+				
+			</div>
+		</form>		
+		
+		
+		<div ng-show="bussiness_sa_show">
+				<label class="item item-input">
+					<span class="input-label">Publishable Key</span>
+					<input type="text" ng-model="bussiness_details_1.publishKey" maxlength="40" name="publishKey" ng-disabled="true" autocomplete=off required>
+				</label>
+			<form name="bussiness_sa_Form" novalidate>
+				<label class="item item-input">
+					<span class="input-label">Publishable Key</span>
+					<input type="text" ng-model="bussiness_sa.publishKey" name="publishKey" maxlength="40" autocomplete=off
+					ng-blur="bussiness_sa_Form.publishKey.$dirty && bussSA_publishKey(bussiness_sa)" required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">conf Publishable Key</span>
+					<input type="text" ng-model="bussiness_sa.confpublishKey" name="confpublishKey" maxlength="40" autocomplete=off
+					ng-blur="bussiness_sa_Form.confpublishKey.$dirty && bussSA_confpublishKey(bussiness_sa)" required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Private Key</span>
+					<input type="password" ng-model="bussiness_sa.privateKey" name="privateKey" maxlength="40" autocomplete=off 
+					ng-blur="bussiness_sa_Form.privateKey.$dirty && bussSA_privateKey(bussiness_sa)" required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Conf Private Key</span>
+					<input type="password" ng-model="bussiness_sa.confprivateKey" maxlength="40" name="confprivateKey" autocomplete=off ng-blur="bussiness_sa_Form.confprivateKey.$dirty && bussSA_confprivateKey(bussiness_sa)" required>
+				</label>
+				<div class="button-bar">
+					<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="bussinessDetails()" ng-disabled="">Back</button> -->
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="bussiness_change_sa(bussiness_sa)" ng-disabled="bussiness_sa_Form.$invalid">Submit</button>
+						
+				</div>
+			</form>
+		</div>
+		
+		<div ng-show="Add_Item">
+			<form name="Add_Item_form" novalidate>
+				<label class="item item-input">
+					<span class="input-label">Item Name</span>
+					<input type="text" ng-model="item.name" name="name" maxlength="20" autocomplete=off required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Price</span>
+					<input type="number" ng-model="item.price" name="price" maxlength="6" autocomplete=off required>
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Item Description</span>
+					<textarea autocomplete=off required ng-model="item.description" maxlength="60" name="description" ></textarea>
+				</label>
+				<!-- <button class="button button-full button-positive" ng-click="AddImage()" ng-disabled="">Add Image</button> -->
+				<div class="button-bar">
+					<button class="button button-full icon-left ion-chevron-left button-positive" ng-click="addItem()" ng-disabled="">Cancel</button>
+					<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="submitItem(item)" ng-disabled="Add_Item_form.$invalid">Submit</button>
+				</div>
+			</form>
+		</div>
+		
+		<div class="table" ng-show="Menu_Show">
+			<div class="row header">
+				<div class="col">Select</div>
+				<div class="col">Name</div>
+				<div class="col">Price</div>
+				<div class="col">Quantity</div>
+			</div>
+			<div class="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in itemArray" >
+				<div class="col"><input type="checkbox" ng-model="item.selected" value="item"></div>
+				<div class="col">{{item.name}}</div>
+				<div class="col">{{item.price | currency}}</div>
+				<div class="col">
+					<input type="number" ng-model="item.quantity" name="quantity" maxlength="6" placeholder="Quantity">
+				</div>
+			</div>
+			<div>
+				<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="addToCart()" ng-disabled="buttonEnabled()">Add To Cart</button>
+			</div>
+		</div>
+		
+		<div ng-show="cart_show">
+			<div class="row header">
+				<div class="col">Item Name</div>
+				<div class="col">Item Price</div>
+				<div class="col">Item Quantity</div>
+				<div class="col">Amount</div>
+			</div>
+			<div class="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in cartArray" >
+				<div class="col">{{item.name}}</div>
+				<div class="col">{{item.price | currency}}</div>
+				<div class="col">{{item.quantity}}</div>
+				<div class="col">{{item.price*item.quantity | currency}}</div>
+			</div>
+			<div class="row" >
+				<div class="col col-60">Total Bill</div>
+				<div class="col col-40">{{total}}</div>
+			</div>	
+			<div class="button-bar">
+				<!-- <button class="button button-full icon-left ion-chevron-left button-positive" ng-click="backToMenu()" ng-disabled="">Back</button> -->
+				<button class="button button-full icon-right ion-chevron-right button-positive" ng-click="checkOut(cartArray)" ng-disabled="">Check Out</button>
+			</div>
+		</div>
+		
+		<div ng-show="delete_item">
+			<div class="row header">
+				<div class="col">Delete</div>
+				<div class="col">Item Name</div>
+				<div class="col">Item Price</div>
+				<div class="col">Item Description</div>
+			</div>
+			
+			<div class="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in itemArray" >
+				<div class="col">
+				<button class="button button-clear button-dark" ng-click="delete_item_function(item.name)"><i class="ion-trash-a"></i></button>
+				</div>
+				<div class="col">{{item.name}}</div>
+				<div class="col">{{item.price | currency}}</div>
+				<div class="col">{{item.description}}</div>
+			</div>
+		</div>
+		
+		
+		<div ng-show="bussPayment_History">
+			<div class="row header">
+				<div class="col">Date</div>
+				<div class="col">Customer Name</div>
+				<div class="col">Customer Email</div>
+				<div class="col">Amount</div>
+			</div>
+			<div class="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="bussPayment in bussPaymentArray" >
+				<div class="col">{{bussPayment.date}}</div>
+				<div class="col">{{bussPayment.customer_name}}</div>
+				<div class="col">{{bussPayment.customer_email}}</div>
+				<div class="col">{{bussPayment.amount | currency}}</div>
+			</div>
+		</div>
+		
+		
+		
+		<ion-slide-box pager-click="navSlide(index)" auto-play="true" does-continue="true">
+            <ion-slide>
+			<div class="item item-image" ng-show="slider_image" no-repeat fixed >
+                <img ng-src="http://s12.postimg.org/3uj5qaphp/Coffee_Break_Wallpapers.jpg">
+            </div>
+			</ion-slide>
+            <ion-slide>
+            <div class="item item-image" ng-show="slider_image">
+				<img ng-src="http://www.americaherald.com/wp-content/uploads/2015/03/addictive-sensation-of-coffee-1200x1200.jpg">
+            </div>
+			</ion-slide>
+            <ion-slide>
+			<div class="item item-image" ng-show="slider_image">
+                <img ng-src=" https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR6y2kq60NMotHeT88Slm0l19vUzaSjob3gvDqw51kD2sgk2h8Q">
+            </div>
+			</ion-slide>
+        </ion-slide-box>
+		
+	</ion-content>
+	<ion-footer-bar class="bar bar-footer">
+		<div class="button-bar" ng-show='signInSignUp'>
+			<button class="button button-clear button-dark" ng-click="signIn()"><i class="icon ion-home"></i>Sign In</button>
+			<button class="button button-clear button-dark" ng-click="signUp()"><i class="icon ion-card"></i>Sign Up</button>
+		</div>
+		<div class="button-bar" ng-show='customer_home'>
+			<button class="button button-clear button-dark" ng-click="customerHome()"><i class="icon ion-home"></i></button>
+			<button class="button button-clear button-dark" ng-click="generateQRCode()"><i class="icon ion-card"></i></button>
+			<button class="button button-clear button-dark" ng-click="customerHistory()"><i class="icon ion-code"></i></button>
+			<button class="button button-clear button-dark" ng-click="customerDetails()"><i class="icon ion-information-circled"></i></button>
+		</div>
+		<div class="button-bar" ng-show='bussiness_home'>
+			<button class="button button-clear button-dark" ng-click="bussinessHome()"><i class="icon ion-home"></i></button>
+			<button class="button button-clear button-dark" ng-click="showMenu()"><i class="icon ion-navicon-round"></i></button>
+			<button class="button button-clear button-dark" ng-click="bussinessHistory()"><i class="icon ion-code"></i></button>
+			<button class="button button-clear button-dark" ng-click="bussinessDetails()"><i class="icon ion-information-circled"></i></button>
+		</div>
+	</ion-footer-bar>
+	
+	</ion-pane>
+  
+  </body>
+   
+</html>
